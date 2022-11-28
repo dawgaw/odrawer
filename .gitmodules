@@ -5,3 +5,6 @@
 [submodule "libs/bitsery"]
 	path = libs/bitsery
 	url = git@github.com:fraillt/bitsery.git
+[submodule "libs/argh"]
+	path = libs/argh
+	url = git@github.com:adishavit/argh.git

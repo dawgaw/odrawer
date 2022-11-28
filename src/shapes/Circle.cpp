@@ -6,4 +6,4 @@ void Circle::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     sh.setFillColor(this->col);
     target.draw(sh);
 };
-Circle::Circle(const sf::Vector2f &pos, float radius, const sf::Color &col) : col(col), pos(pos), radius(radius){};
+Circle::Circle(const SerializableFloatVector &pos, float radius, const SerializableColor &col) : col(col), pos(pos), radius(radius){};

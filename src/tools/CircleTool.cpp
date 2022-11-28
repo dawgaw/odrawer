@@ -11,10 +11,10 @@ void CircleTool::setPosition(const sf::Vector2f& pos) {
 void CircleTool::onMousePressed(const sf::Vector2f& pos) {
     this->last_pos = this->first_pos = pos;
 }
-sf::Drawable* CircleTool::getDrawable() const {
+std::shared_ptr<BaseShape> CircleTool::getDrawable() const {
     if (this->last_pos != this->first_pos) {
         const auto d = this->last_pos - this->first_pos;
-        return new Circle(first_pos, std::sqrt(d.x * d.x + d.y * d.y), this->color);
+        return std::make_shared<Circle>(first_pos, std::sqrt(d.x * d.x + d.y * d.y), this->color);
     } else
         return nullptr;
 };

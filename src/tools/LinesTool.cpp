@@ -10,9 +10,9 @@ void LinesTool::onMousePressed(const sf::Vector2f& pos) {
     lines.clear();
     prevPos = pos;
 }
-sf::Drawable* LinesTool::getDrawable() const {
+std::shared_ptr<BaseShape> LinesTool::getDrawable() const {
     if (lines.size())
-        return new LinesPath(lines);
+        return std::make_shared<LinesPath>(lines);
     else
         return nullptr;
 }

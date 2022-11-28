@@ -1,14 +1,21 @@
-#include <SFML/Graphics.hpp>
 #ifndef CIRCLE_HPP
 #define CIRCLE_HPP
-class Circle : public sf::Drawable {
+
+#include <shapes/BaseShape.hpp>
+
+class Circle : public BaseShape {
    private:
-    sf::Vector2f pos;
+    SerializableFloatVector pos;
     float radius;
-    sf::Color col;
+    SerializableColor col;
+    template <typename S>
+    friend void serialize(S &s, Circle &o);
+    friend class bitsery::Access;
 
    public:
-    Circle(const sf::Vector2f &pos, float radius, const sf::Color &col);
+    Circle() = default;
+
+    Circle(const SerializableFloatVector &pos, float radius, const SerializableColor &col);
     void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 #endif

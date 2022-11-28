@@ -7,4 +7,4 @@ void Rectangle::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     rect.setFillColor(this->col);
     target.draw(rect);
 };
-Rectangle::Rectangle(const sf::Vector2f &first_pos, const sf::Vector2f &last_pos, const sf::Color &color) : col(color), first_pos(first_pos), last_pos(last_pos){};
+Rectangle::Rectangle(const SerializableFloatVector &first_pos, const SerializableFloatVector &last_pos, const SerializableColor &color) : col(color), first_pos(first_pos), last_pos(last_pos){};

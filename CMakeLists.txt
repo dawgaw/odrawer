@@ -21,7 +21,8 @@ src/tools/LinesTool.cpp
 src/tools/CircleTool.cpp
 src/tools/RectangleTool.cpp
 src/elements/Button.cpp
-
+src/network/Client.cpp
+src/network/Server.cpp
 )
 
 target_link_directories(odrawer PRIVATE libs/SFML/lib)

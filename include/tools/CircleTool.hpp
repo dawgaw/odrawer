@@ -1,6 +1,8 @@
-#include <tools/BaseTool.hpp>
 #ifndef CIRCLETOOL_HPP
 #define CIRCLETOOL_HPP
+
+#include <tools/BaseTool.hpp>
+
 class CircleTool : public BaseTool {
    private:
     sf::Vector2f first_pos, last_pos;
@@ -9,7 +11,7 @@ class CircleTool : public BaseTool {
     CircleTool(const sf::Color& color);
     void setPosition(const sf::Vector2f& pos);
     void onMousePressed(const sf::Vector2f& pos);
-    sf::Drawable* getDrawable() const;
+    std::shared_ptr<BaseShape> getDrawable() const;
     void reset();
 };
 #endif

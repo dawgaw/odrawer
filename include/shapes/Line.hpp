@@ -1,14 +1,20 @@
-#include <SFML/Graphics.hpp>
-
 #ifndef LINE_HPP
 #define LINE_HPP
-class Line : public sf::Drawable {
+
+#include <shapes/BaseShape.hpp>
+
+class Line : public BaseShape {
    private:
-    sf::Vector2f first_pos, second_pos;
-    sf::Color col;
+    SerializableFloatVector first_pos, second_pos;
+    SerializableColor col;
+    friend class bitsery::Access;
+    template <typename S>
+    friend void serialize(S &s, Line &o);
 
    public:
-    Line(const sf::Vector2f &first_pos, const sf::Vector2f &second_pos, const sf::Color &col);
+    Line() = default;
+
+    Line(const SerializableFloatVector &first_pos, const SerializableFloatVector &second_pos, const SerializableColor &col);
     void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 };
 #endif

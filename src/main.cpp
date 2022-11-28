@@ -1,15 +1,21 @@
-#include <bitsery/bitsery.h>
-
 #include <SFML/Graphics.hpp>
-#include <SFML/Network.hpp>
 #include <elements/Button.hpp>
 #include <iostream>
-#include <shapes/Circle.hpp>
+#include <network/Client.hpp>
+#include <network/Server.hpp>
 #include <tools/CircleTool.hpp>
 #include <tools/LinesTool.hpp>
 #include <tools/RectangleTool.hpp>
+#include <utils/SerializableColor.hpp>
 
-int main() {
+int main(int argc, const char *argv[]) {
+    std::unique_ptr<NetworkInterface> nint;
+
+    if (getchar() == 's')
+        nint = std::make_unique<Server>();
+    else
+        nint = std::make_unique<Client>();
+
     sf::RenderWindow window(sf::VideoMode(800, 400), "online drawer");
     window.setFramerateLimit(60);
 
@@ -23,8 +29,10 @@ int main() {
 
     bool isMousePressed = false;
 
+    nint->start();
+
     {  // init buttons
-        const std::array<std::pair<const sf::Color, const sf::String>, 6> colors{{
+        const std::array<std::pair<const SerializableColor, const sf::String>, 6> colors{{
             {sf::Color::Black, "Black"},
             {sf::Color::Green, "Green"},
             {sf::Color::Yellow, "Yellow"},
@@ -98,20 +106,27 @@ int main() {
         }
         window.clear();
 
-        sf::Drawable *d = tool->getDrawable();
+        std::shared_ptr<BaseShape> d = tool->getDrawable();
         window.draw(permanentPic);
-
         if (d) {
             if (isMousePressed)
                 window.draw(*d);
             else {
+                nint->send(d);
                 permanentPicTexture.draw(*d);
                 permanentPicTexture.display();
                 window.draw(permanentPic);
+
                 tool->reset();
             }
-            delete d;
         }
+
+        auto recData = nint->getData();
+        for (auto &&i : recData) {
+            permanentPicTexture.draw(*i);
+            permanentPicTexture.display();
+        }
+
         for (auto &&i : buttons) {
             i.update();
             window.draw(i);

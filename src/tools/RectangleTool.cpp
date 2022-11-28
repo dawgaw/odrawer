@@ -10,9 +10,9 @@ void RectangleTool::setPosition(const sf::Vector2f& pos) {
 void RectangleTool::onMousePressed(const sf::Vector2f& pos) {
     this->last_pos = this->first_pos = pos;
 }
-sf::Drawable* RectangleTool::getDrawable() const {
+std::shared_ptr<BaseShape> RectangleTool::getDrawable() const {
     if (this->last_pos != this->first_pos)
-        return new Rectangle(first_pos, last_pos, this->color);
+        return std::make_shared<Rectangle>(first_pos, last_pos, this->color);
     else
         return nullptr;
 };

@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(online-drawer)
+project(odrawer)
 
 set(SFML_BUILD_AUDIO FALSE)
 set(BUILD_SHARED_LIBS FALSE)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(libs/SFML)
 
@@ -65,7 +67,8 @@ target_link_libraries(odrawer sfml-graphics sfml-window sfml-network)
 add_custom_target(copy_resources ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/resources
-        ${PROJECT_BINARY_DIR}/resources
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources
         COMMENT "Copying resources into binary directory")
 
 add_dependencies(odrawer copy_resources)
+

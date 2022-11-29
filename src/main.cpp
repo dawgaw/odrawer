@@ -10,26 +10,24 @@
 #include <tools/RectangleTool.hpp>
 
 int main(int argc, const char *argv[]) {
-    std::unique_ptr<NetworkInterface>
-        nint;
+    argh::parser argParser({"-a", "--address", "-p", "--port", "-s", "--server"});
 
-    argh::parser argParser({"-s", "--server", "-p", "--port", "-a", "--address"});
     argParser.parse(argc, argv);
 
-    int port = 8080;
-    if (argParser[{"p", "port"}])
-        argParser({"p", "port"}) >> port;
+    const char *ip = argParser({"-a", "--address"}, "127.0.0.1").str().c_str();
+    std::cout << ip << "\n";
 
-    const char *ip = "127.0.0.1";
-    if (argParser[{"a", "address"}])
-        ip = argParser({"a", "address"}).str().c_str();
+    int port;
+    argParser({"-p", "--port"}, 8080) >> port;
+    std::cout << port << "\n";
 
-    if (argParser[{"s", "server"}]) {
+    std::unique_ptr<NetworkInterface> netInterface;
+    if (argParser[{"-s", "--server"}]) {
         std::cout << "server\n";
-        nint = std::make_unique<Server>();
+        netInterface = std::make_unique<Server>();
     } else {
         std::cout << "client\n";
-        nint = std::make_unique<Client>();
+        netInterface = std::make_unique<Client>();
     }
 
     sf::RenderWindow window(sf::VideoMode(800, 400), "online drawer");
@@ -45,7 +43,7 @@ int main(int argc, const char *argv[]) {
 
     bool isMousePressed = false;
 
-    nint->start(ip, port);
+    netInterface->start(ip, port);
 
     {  // init buttons
         const std::array<std::pair<const sf::Color, const sf::String>, 6> colors{{
@@ -128,7 +126,7 @@ int main(int argc, const char *argv[]) {
             if (isMousePressed)
                 window.draw(*d);
             else {
-                nint->send(d);
+                netInterface->send(d);
                 permanentPicTexture.draw(*d);
                 permanentPicTexture.display();
                 window.draw(permanentPic);
@@ -137,7 +135,7 @@ int main(int argc, const char *argv[]) {
             }
         }
 
-        auto recData = nint->getData();
+        auto recData = netInterface->getData();
         for (auto &&i : recData) {
             permanentPicTexture.draw(*i);
             permanentPicTexture.display();

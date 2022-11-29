@@ -1,13 +1,15 @@
 #include <network/Server.hpp>
-#include <utils/SerializationConfig.hpp>
+#include <utils/SerializeUtils.hpp>
 
 Server::~Server() {
+    if (this->listenThread)
+        this->listenThread->terminate();
     this->listener.close();
 }
 
-void Server::start() {
-    this->listener.listen(8080, sf::IpAddress("127.0.0.1"));
-    this->thrd = std::thread([this] {
+void Server::start(const char* ip, int port) {
+    this->listener.listen(port, ip);
+    this->listenThread = std::make_unique<sf::Thread>([this] {
         do {
             std::unique_ptr<sf::TcpSocket> socket = std::make_unique<sf::TcpSocket>();
             if (this->listener.accept(*socket) == sf::Socket::Status::Done) {
@@ -18,48 +20,29 @@ void Server::start() {
             }
         } while (true);
     });
-    this->thrd.detach();
 }
 
-void Server::send(std::shared_ptr<BaseShape> data) {
-    Buffer buffer{};
-    size_t writtenSize{};
-    TContext ctx{};
-    std::get<1>(ctx).registerBasesList<MySerializer>(MyPolymorphicClassesForRegistering{});
-    // create writer and serialize
-    MySerializer ser{ctx, buffer};
-
-    ser.ext(data, bitsery::ext::StdSmartPtr{});
-    ser.adapter().flush();
-    writtenSize = ser.adapter().writtenBytesCount();
-    assert(std::get<0>(ctx).isValid());
-    sf::Packet p;
-    p.append(buffer.data(), writtenSize);
+void Server::sendAllExcept(sf::Packet& packet, const std::unique_ptr<sf::TcpSocket>& socket) {
     for (auto&& i : sockets) {
-        i->send(p);
+        if (i.get() != socket.get())
+            i->send(packet);
     }
+}
+
+void Server::send(const std::shared_ptr<BaseShape>& data) {
+    SerializeUtils::Buffer buffer(SerializeUtils::serialize(data));
+    sf::Packet p;
+    p.append(buffer.data(), buffer.size());
+    this->sendAllExcept(p, nullptr);
 }
 
 std::vector<std::shared_ptr<BaseShape>> Server::getData() {
     std::vector<std::shared_ptr<BaseShape>> d;
-    size_t writtenSize{};
-    TContext ctx{};
-    std::get<1>(ctx).registerBasesList<MyDeserializer>(MyPolymorphicClassesForRegistering{});
-    // create writer and serialize
-
     for (auto&& i : sockets) {
-        std::unique_ptr<BaseShape> data;
         sf::Packet p;
         if (i->receive(p) == sf::Socket::Status::Done) {
-            Buffer buffer((uint8_t*)p.getData(), (uint8_t*)p.getData() + p.getDataSize());
-
-            MyDeserializer des{ctx, buffer.begin(), buffer.size()};
-            des.ext(data, bitsery::ext::StdSmartPtr{});
-
-            assert(des.adapter().error() == bitsery::ReaderError::NoError && des.adapter().isCompletedSuccessfully());
-            assert(std::get<0>(ctx).isValid());
-            std::get<0>(ctx).clearSharedState();
-
+            std::shared_ptr<BaseShape> data = SerializeUtils::deserialize(SerializeUtils::Buffer((uint8_t*)p.getData(), (uint8_t*)p.getData() + p.getDataSize()));
+            this->sendAllExcept(p, i);
             d.push_back(std::move(data));
         }
     }

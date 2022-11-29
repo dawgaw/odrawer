@@ -1,3 +1,5 @@
+#include <argh.h>
+
 #include <SFML/Graphics.hpp>
 #include <elements/Button.hpp>
 #include <iostream>
@@ -6,21 +8,35 @@
 #include <tools/CircleTool.hpp>
 #include <tools/LinesTool.hpp>
 #include <tools/RectangleTool.hpp>
-#include <utils/SerializableColor.hpp>
 
 int main(int argc, const char *argv[]) {
-    std::unique_ptr<NetworkInterface> nint;
+    std::unique_ptr<NetworkInterface>
+        nint;
 
-    if (getchar() == 's')
+    argh::parser argParser({"-s", "--server", "-p", "--port", "-a", "--address"});
+    argParser.parse(argc, argv);
+
+    int port = 8080;
+    if (argParser[{"p", "port"}])
+        argParser({"p", "port"}) >> port;
+
+    const char *ip = "127.0.0.1";
+    if (argParser[{"a", "address"}])
+        ip = argParser({"a", "address"}).str().c_str();
+
+    if (argParser[{"s", "server"}]) {
+        std::cout << "server\n";
         nint = std::make_unique<Server>();
-    else
+    } else {
+        std::cout << "client\n";
         nint = std::make_unique<Client>();
+    }
 
     sf::RenderWindow window(sf::VideoMode(800, 400), "online drawer");
     window.setFramerateLimit(60);
 
     sf::Font font;
-    font.loadFromFile("Arialn.ttf");
+    font.loadFromFile("resources/Arialn.ttf");
 
     std::vector<Button> buttons;
     buttons.reserve(10);
@@ -29,10 +45,10 @@ int main(int argc, const char *argv[]) {
 
     bool isMousePressed = false;
 
-    nint->start();
+    nint->start(ip, port);
 
     {  // init buttons
-        const std::array<std::pair<const SerializableColor, const sf::String>, 6> colors{{
+        const std::array<std::pair<const sf::Color, const sf::String>, 6> colors{{
             {sf::Color::Black, "Black"},
             {sf::Color::Green, "Green"},
             {sf::Color::Yellow, "Yellow"},

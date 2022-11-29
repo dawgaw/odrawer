@@ -1,46 +1,24 @@
 
 #include <network/Client.hpp>
-#include <utils/SerializationConfig.hpp>
+#include <utils/SerializeUtils.hpp>
 
-void Client::start() {
-    ;
-    this->socket.connect("127.0.0.1", 8020);
+void Client::start(const char* ip, int port) {
+    this->socket.connect(ip, port);
     this->socket.setBlocking(false);
 }
 
-void Client::send(std::shared_ptr<BaseShape> data) {
-    Buffer buffer{};
-    size_t writtenSize{};
-    TContext ctx{};
-    std::get<1>(ctx).registerBasesList<MySerializer>(MyPolymorphicClassesForRegistering{});
-
-    MySerializer ser{ctx, buffer};
-
-    ser.ext(data, bitsery::ext::StdSmartPtr{});
-    ser.adapter().flush();
-    writtenSize = ser.adapter().writtenBytesCount();
-    assert(std::get<0>(ctx).isValid());
-
-    socket.send(buffer.data(), writtenSize);
+void Client::send(const std::shared_ptr<BaseShape>& data) {
+    SerializeUtils::Buffer buffer(SerializeUtils::serialize(data));
+    sf::Packet p;
+    p.append(buffer.data(), buffer.size());
+    socket.send(p);
 }
 
 std::vector<std::shared_ptr<BaseShape>> Client::getData() {
     std::vector<std::shared_ptr<BaseShape>> d;
-    size_t writtenSize{};
-    TContext ctx{};
-    std::get<1>(ctx).registerBasesList<MyDeserializer>(MyPolymorphicClassesForRegistering{});
-    std::shared_ptr<BaseShape> data;
     sf::Packet p;
     if (socket.receive(p) == sf::Socket::Status::Done) {
-        Buffer buffer((uint8_t*)p.getData(), (uint8_t*)p.getData() + p.getDataSize());
-        MyDeserializer des{ctx, buffer.begin(), buffer.size()};
-
-        des.ext(data, bitsery::ext::StdSmartPtr{});
-
-        assert(des.adapter().error() == bitsery::ReaderError::NoError && des.adapter().isCompletedSuccessfully());
-        assert(std::get<0>(ctx).isValid());
-        std::get<0>(ctx).clearSharedState();
-        d.push_back(data);
+        d.push_back(SerializeUtils::deserialize(SerializeUtils::Buffer((uint8_t*)p.getData(), (uint8_t*)p.getData() + p.getDataSize())));
     }
     return d;
 }

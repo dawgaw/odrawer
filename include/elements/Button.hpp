@@ -1,3 +1,6 @@
+#ifndef BUTTON_HPP
+#define BUTTON_HPP
+
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <functional>
@@ -32,3 +35,4 @@ class Button : public sf::Drawable {
 
     void handleClick();
 };
+#endif

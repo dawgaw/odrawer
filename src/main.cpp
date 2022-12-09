@@ -16,19 +16,23 @@ int main(int argc, const char *argv[]) {
 
     const char *ip = argParser({"-a", "--address"}, "127.0.0.1").str().c_str();
     std::cout << ip << "\n";
+    printf("%s\n", ip);
 
     int port;
     argParser({"-p", "--port"}, 8080) >> port;
-    std::cout << port << "\n";
+    printf("%d\n", port);
 
-    std::unique_ptr<NetworkInterface> netInterface;
+    std::unique_ptr<Client> client;
+    std::unique_ptr<Server> server;
+
     if (argParser[{"-s", "--server"}]) {
-        std::cout << "server\n";
-        netInterface = std::make_unique<Server>();
-    } else {
-        std::cout << "client\n";
-        netInterface = std::make_unique<Client>();
+        printf("you are server\n");
+        server = std::make_unique<Server>();
+        server->start(ip, port);
     }
+
+    client = std::make_unique<Client>();
+    client->start(ip, port);
 
     sf::RenderWindow window(sf::VideoMode(800, 400), "online drawer");
     window.setFramerateLimit(60);
@@ -42,8 +46,6 @@ int main(int argc, const char *argv[]) {
     BaseTool *tool;
 
     bool isMousePressed = false;
-
-    netInterface->start(ip, port);
 
     {  // init buttons
         const std::array<std::pair<const sf::Color, const sf::String>, 6> colors{{
@@ -126,7 +128,7 @@ int main(int argc, const char *argv[]) {
             if (isMousePressed)
                 window.draw(*d);
             else {
-                netInterface->send(d);
+                client->send(d);
                 permanentPicTexture.draw(*d);
                 permanentPicTexture.display();
                 window.draw(permanentPic);
@@ -135,7 +137,7 @@ int main(int argc, const char *argv[]) {
             }
         }
 
-        auto recData = netInterface->getData();
+        auto recData = client->getData();
         for (auto &&i : recData) {
             permanentPicTexture.draw(*i);
             permanentPicTexture.display();

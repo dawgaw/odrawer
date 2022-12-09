@@ -43,7 +43,6 @@ include/elements/Button.hpp
 
 include/network/Client.hpp
 include/network/Server.hpp
-include/network/NetworkInterface.hpp
 
 include/shapes/BaseShape.hpp
 include/shapes/Circle.hpp

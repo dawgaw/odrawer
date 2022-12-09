@@ -1,9 +1,11 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <network/NetworkInterface.hpp>
+#include <SFML/Network.hpp>
+#include <memory>
+#include <shapes/BaseShape.hpp>
 
-class Client : public NetworkInterface {
+class Client {
    private:
     sf::TcpSocket socket;
 

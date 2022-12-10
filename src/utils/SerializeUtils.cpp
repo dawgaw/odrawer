@@ -47,8 +47,7 @@ void serialize(S& s, Rectangle& o) {
 template <typename S>
 void serialize(S& s, LinesPath& o) {
     s.ext(o, bitsery::ext::BaseClass<BaseShape>{});
-
-    s.container(o.lines, std::numeric_limits<int>::max(), [](S& s, Line& item) {
+    s.container(o.lines, std::numeric_limits<u_int32_t>::max(), [](S& s, Line& item) {
         s.object(item);
     });
 }

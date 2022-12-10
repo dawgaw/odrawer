@@ -12,9 +12,7 @@ class Server {
 
    public:
     void start(const std::string& ip, int port);
-    ~Server() {
-        this->listenThread->terminate();
-    }
+    ~Server();
 };
 
 #endif

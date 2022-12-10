@@ -44,8 +44,6 @@ int main(int argc, const char *argv[]) {
 
     std::shared_ptr<BaseTool> tool;
 
-    bool isMousePressed = false;
-
     {  // init buttons
         const std::array<std::pair<const sf::Color, const sf::String>, 6> colors{{
             {sf::Color::Black, "Black"},
@@ -60,7 +58,7 @@ int main(int argc, const char *argv[]) {
             {std::make_shared<CircleTool>(sf::Color::White), "Circle"},
             {std::make_shared<RectangleTool>(sf::Color::White), "rect"},
         }};
-        auto index = 0;
+        int index = 0;
         for (auto &&i : colors) {
             buttons.emplace_back(sf::Vector2f(100 * index, 20), i.second, font);
             buttons.back().onClick = [color = i.first, &tool]() {
@@ -82,7 +80,10 @@ int main(int argc, const char *argv[]) {
     sf::RenderTexture permanentPicTexture;
     permanentPicTexture.create(window.getSize().x, window.getSize().y);
     sf::Sprite permanentPic(permanentPicTexture.getTexture());
-    // permanentPic.scale({1, -1});
+    // permanentPicTexture.getTexture().copyToImage().saveToFile("file");
+
+    bool isMousePressed = false;
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {

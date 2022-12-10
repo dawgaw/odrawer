@@ -3,6 +3,10 @@
 #include <thread>
 #include <utils/SerializeUtils.hpp>
 
+Server::~Server() {
+    this->listenThread->terminate();
+}
+
 void Server::start(const std::string& ip, int port) {
     this->listener.listen(port, ip);
     this->listener.setBlocking(false);
@@ -14,12 +18,14 @@ void Server::start(const std::string& ip, int port) {
                 this->sockets.back()->setBlocking(false);
                 printf("server:new connection\n");
             }
-
-            // for (auto&& i : this->sockets) {
-            //     if (i->getRemoteAddress() == sf::IpAddress::None) {
-            //         printf("disco\n");
-            //     }
-            // }
+            this->sockets.erase(std::remove_if(this->sockets.begin(), this->sockets.end(), [](std::unique_ptr<sf::TcpSocket>& i) {
+                                    if (i->getRemoteAddress() == sf::IpAddress::None) {
+                                        printf("server:client disconnected\n");
+                                        return true;
+                                    }
+                                    return false;
+                                }),
+                                this->sockets.end());
 
             sf::Packet p;
             for (auto&& i : this->sockets) {

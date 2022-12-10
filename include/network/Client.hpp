@@ -12,6 +12,6 @@ class Client {
    public:
     std::vector<std::shared_ptr<BaseShape>> getData();
     void send(const std::shared_ptr<BaseShape>& data);
-    void start(const char* ip, int port);
+    void start(const std::string& ip, int port);
 };
 #endif

@@ -2,7 +2,7 @@
 #include <network/Client.hpp>
 #include <utils/SerializeUtils.hpp>
 
-void Client::start(const char* ip, int port) {
+void Client::start(const std::string& ip, int port) {
     this->socket.connect(ip, port);
     this->socket.setBlocking(false);
 }

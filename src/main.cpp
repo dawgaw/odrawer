@@ -14,9 +14,8 @@ int main(int argc, const char *argv[]) {
 
     argParser.parse(argc, argv);
 
-    const char *ip = argParser({"-a", "--address"}, "127.0.0.1").str().c_str();
-    std::cout << ip << "\n";
-    printf("%s\n", ip);
+    const std::string ip = argParser({"-a", "--address"}, "127.0.0.1").str();
+    printf("%s\n", ip.c_str());
 
     int port;
     argParser({"-p", "--port"}, 8080) >> port;

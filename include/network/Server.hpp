@@ -11,7 +11,7 @@ class Server {
     std::unique_ptr<sf::Thread> listenThread;
 
    public:
-    void start(const char* ip, int port);
+    void start(const std::string& ip, int port);
     ~Server() {
         this->listenThread->terminate();
     }

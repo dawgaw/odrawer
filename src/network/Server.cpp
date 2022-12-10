@@ -1,7 +1,9 @@
+#include <chrono>
 #include <network/Server.hpp>
+#include <thread>
 #include <utils/SerializeUtils.hpp>
 
-void Server::start(const char* ip, int port) {
+void Server::start(const std::string& ip, int port) {
     this->listener.listen(port, ip);
     this->listener.setBlocking(false);
     this->listenThread = std::make_unique<sf::Thread>([this] {
@@ -29,6 +31,7 @@ void Server::start(const char* ip, int port) {
                     }
                 }
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         } while (true);
     });

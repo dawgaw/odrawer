@@ -42,7 +42,7 @@ int main(int argc, const char *argv[]) {
     std::vector<Button> buttons;
     buttons.reserve(10);
 
-    BaseTool *tool;
+    std::shared_ptr<BaseTool> tool;
 
     bool isMousePressed = false;
 
@@ -55,10 +55,10 @@ int main(int argc, const char *argv[]) {
             {sf::Color::Blue, "Blue"},
             {sf::Color::White, "White"},
         }};
-        const std::array<std::pair<BaseTool *, const sf::String>, 3> tools{{
-            {new LinesTool(sf::Color::White), "pen"},
-            {new CircleTool(sf::Color::White), "Circle"},
-            {new RectangleTool(sf::Color::White), "rect"},
+        const std::array<std::pair<std::shared_ptr<BaseTool>, const sf::String>, 3> tools{{
+            {std::make_shared<LinesTool>(sf::Color::White), "pen"},
+            {std::make_shared<CircleTool>(sf::Color::White), "Circle"},
+            {std::make_shared<RectangleTool>(sf::Color::White), "rect"},
         }};
         auto index = 0;
         for (auto &&i : colors) {

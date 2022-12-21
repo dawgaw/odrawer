@@ -1,5 +1,5 @@
-#ifndef RECTANGLETOOL_HPP
-#define RECTANGLETOOL_HPP
+#ifndef TOOLS_RECTANGLETOOL_HPP
+#define TOOLS_RECTANGLETOOL_HPP
 
 #include <tools/BaseTool.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef BASETOOL_HPP
-#define BASETOOL_HPP
+#ifndef TOOLS_BASETOOL_HPP
+#define TOOLS_BASETOOL_HPP
 
 #include <SFML/Graphics.hpp>
 #include <memory>

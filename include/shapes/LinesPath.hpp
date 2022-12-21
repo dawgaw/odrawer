@@ -1,5 +1,5 @@
-#ifndef LINESPATH_HPP
-#define LINESPATH_HPP
+#ifndef SHAPES_LINESPATH_HPP
+#define SHAPES_LINESPATH_HPP
 
 #include <shapes/Line.hpp>
 

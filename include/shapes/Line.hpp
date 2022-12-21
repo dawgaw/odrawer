@@ -1,5 +1,5 @@
-#ifndef LINE_HPP
-#define LINE_HPP
+#ifndef SHAPES_LINE_HPP
+#define SHAPES_LINE_HPP
 
 #include <shapes/BaseShape.hpp>
 

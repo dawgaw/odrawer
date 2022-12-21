@@ -4,51 +4,51 @@
 #include <utils/SerializeUtils.hpp>
 
 template <typename S>
-void serialize(S& s, BaseShape& o) {}
+void serialize(S& serializer, BaseShape& object) {}
 
 template <typename S>
-void serialize(S& s, SerializableFloatVector& o) {
-    s.value4b(o.x);
-    s.value4b(o.y);
+void serialize(S& serializer, SerializableFloatVector& object) {
+    serializer.value4b(object.x);
+    serializer.value4b(object.y);
 }
 
 template <typename S>
-void serialize(S& s, SerializableColor& o) {
-    s.value1b(o.r);
-    s.value1b(o.g);
-    s.value1b(o.b);
-    s.value1b(o.a);
+void serialize(S& serializer, SerializableColor& object) {
+    serializer.value1b(object.r);
+    serializer.value1b(object.g);
+    serializer.value1b(object.b);
+    serializer.value1b(object.a);
 }
 
 template <typename S>
-void serialize(S& s, Circle& o) {
-    s.ext(o, bitsery::ext::BaseClass<BaseShape>{});
-    s.object(o.pos);
-    s.value4b(o.radius);
-    s.object(o.col);
+void serialize(S& serializer, Circle& object) {
+    serializer.ext(object, bitsery::ext::BaseClass<BaseShape>{});
+    serializer.object(object.pos);
+    serializer.value4b(object.radius);
+    serializer.object(object.col);
 }
 
 template <typename S>
-void serialize(S& s, Line& o) {
-    s.ext(o, bitsery::ext::BaseClass<BaseShape>{});
-    s.object(o.first_pos);
-    s.object(o.second_pos);
-    s.object(o.col);
+void serialize(S& serializer, Line& object) {
+    serializer.ext(object, bitsery::ext::BaseClass<BaseShape>{});
+    serializer.object(object.first_pos);
+    serializer.object(object.second_pos);
+    serializer.object(object.col);
 }
 
 template <typename S>
-void serialize(S& s, Rectangle& o) {
-    s.ext(o, bitsery::ext::BaseClass<BaseShape>{});
-    s.object(o.first_pos);
-    s.object(o.last_pos);
-    s.object(o.col);
+void serialize(S& serializer, Rectangle& object) {
+    serializer.ext(object, bitsery::ext::BaseClass<BaseShape>{});
+    serializer.object(object.first_pos);
+    serializer.object(object.last_pos);
+    serializer.object(object.col);
 }
 
 template <typename S>
-void serialize(S& s, LinesPath& o) {
-    s.ext(o, bitsery::ext::BaseClass<BaseShape>{});
-    s.container(o.lines, std::numeric_limits<u_int32_t>::max(), [](S& s, Line& item) {
-        s.object(item);
+void serialize(S& serializer, LinesPath& object) {
+    serializer.ext(object, bitsery::ext::BaseClass<BaseShape>{});
+    serializer.container(object.lines, std::numeric_limits<u_int32_t>::max(), [](S& serializer, Line& item) {
+        serializer.object(item);
     });
 }
 

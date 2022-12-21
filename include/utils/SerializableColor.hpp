@@ -1,5 +1,5 @@
-#ifndef SERIALIZABLE_COLOR_HPP
-#define SERIALIZABLE_COLOR_HPP
+#ifndef UTILS_SERIALIZABLECOLOR_HPP
+#define UTILS_SERIALIZABLECOLOR_HPP
 
 #include <bitsery/bitsery.h>
 

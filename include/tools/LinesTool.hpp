@@ -1,5 +1,5 @@
-#ifndef LINETOOL_HPP
-#define LINETOOL_HPP
+#ifndef TOOLS_LINETOOL_HPP
+#define TOOLS_LINETOOL_HPP
 
 #include <shapes/Line.hpp>
 #include <tools/BaseTool.hpp>

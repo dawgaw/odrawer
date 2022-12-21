@@ -1,6 +1,7 @@
 #include <argh.h>
 
 #include <SFML/Graphics.hpp>
+#include <array>
 #include <elements/Button.hpp>
 #include <iostream>
 #include <network/Client.hpp>
@@ -9,83 +10,96 @@
 #include <tools/LinesTool.hpp>
 #include <tools/RectangleTool.hpp>
 
+constexpr int DEFAULT_PORT = 8080;
+constexpr int DEFAULT_HEIGHT = 400;
+constexpr int DEFAULT_WIDTH = 800;
+constexpr float BUTTON_OFFSET_Y = 20;
+constexpr float BUTTON_OFFSET_X = 10;
+constexpr float BUTTON_SIZE_Y = 25;
+constexpr float BUTTON_SIZE_X = 70;
+constexpr int FRAME_RATE = 60;
+
+std::vector<Button> initButtons(const sf::Font &font, std::shared_ptr<BaseTool> &tool) {
+    const std::array<std::pair<const sf::Color, const sf::String>, 6> colors{{
+        {sf::Color::Black, "Black"},
+        {sf::Color::Green, "Green"},
+        {sf::Color::Yellow, "Yellow"},
+        {sf::Color::Magenta, "Magenta"},
+        {sf::Color::Blue, "Blue"},
+        {sf::Color::White, "White"},
+    }};
+    const std::array<std::pair<std::shared_ptr<BaseTool>, const sf::String>, 3> tools{{
+        {std::make_shared<LinesTool>(sf::Color::White), "pen"},
+        {std::make_shared<CircleTool>(sf::Color::White), "Circle"},
+        {std::make_shared<RectangleTool>(sf::Color::White), "rect"},
+    }};
+
+    std::vector<Button> buttons;
+    buttons.reserve(tools.size() + colors.size());
+
+    int index = 0;
+    for (auto &&item : colors) {
+        buttons.emplace_back(sf::Vector2f((BUTTON_SIZE_X + BUTTON_OFFSET_X) * index, BUTTON_OFFSET_Y), item.second, font, sf::Vector2f(BUTTON_SIZE_X, BUTTON_SIZE_Y));
+        buttons.back().onClick = [color = item.first, &tool]() {
+            tool->setColor(color);
+        };
+        index++;
+    }
+    index = 0;
+    for (auto &&item : tools) {
+        buttons.emplace_back(sf::Vector2f((BUTTON_SIZE_X + BUTTON_OFFSET_X) * index, BUTTON_OFFSET_Y * 2 + BUTTON_SIZE_Y), item.second, font, sf::Vector2f(BUTTON_SIZE_X, BUTTON_SIZE_Y));
+        buttons.back().onClick = [&tool, item = item.first]() {
+            tool = item;
+        };
+        index++;
+    }
+    tool = tools.at(0).first;
+
+    return std::move(buttons);
+}
+
 int main(int argc, const char *argv[]) {
     argh::parser argParser({"-a", "--address", "-p", "--port", "-s", "--server"});
 
     argParser.parse(argc, argv);
 
-    const std::string ip = argParser({"-a", "--address"}, "127.0.0.1").str();
-    printf("%s\n", ip.c_str());
+    const std::string serverAddress = argParser({"-a", "--address"}, "127.0.0.1").str();
+    std::cout << "ip:" << serverAddress;
 
-    int port;
-    argParser({"-p", "--port"}, 8080) >> port;
-    printf("%d\n", port);
+    int port = DEFAULT_PORT;
+    argParser({"-p", "--port"}, port) >> port;
+    std::cout << "port:" << port;
 
-    std::unique_ptr<Client> client;
-    std::unique_ptr<Server> server;
+    std::unique_ptr<Client> client = nullptr;
+    std::unique_ptr<Server> server = nullptr;
 
     if (argParser[{"-s", "--server"}]) {
-        printf("you are server\n");
+        std::cout << "you are server\n";
         server = std::make_unique<Server>();
-        server->start(ip, port);
+        server->start(serverAddress, port);
     }
 
     client = std::make_unique<Client>();
-    client->start(ip, port);
+    client->start(serverAddress, port);
 
-    sf::RenderWindow window(sf::VideoMode(800, 400), "online drawer");
-    window.setFramerateLimit(60);
+    sf::RenderWindow window(sf::VideoMode(DEFAULT_WIDTH, DEFAULT_HEIGHT), "online drawer");
+    window.setFramerateLimit(FRAME_RATE);
 
     sf::Font font;
     font.loadFromFile("resources/Arialn.ttf");
 
-    std::vector<Button> buttons;
-    buttons.reserve(10);
-
     std::shared_ptr<BaseTool> tool;
-
-    {  // init buttons
-        const std::array<std::pair<const sf::Color, const sf::String>, 6> colors{{
-            {sf::Color::Black, "Black"},
-            {sf::Color::Green, "Green"},
-            {sf::Color::Yellow, "Yellow"},
-            {sf::Color::Magenta, "Magenta"},
-            {sf::Color::Blue, "Blue"},
-            {sf::Color::White, "White"},
-        }};
-        const std::array<std::pair<std::shared_ptr<BaseTool>, const sf::String>, 3> tools{{
-            {std::make_shared<LinesTool>(sf::Color::White), "pen"},
-            {std::make_shared<CircleTool>(sf::Color::White), "Circle"},
-            {std::make_shared<RectangleTool>(sf::Color::White), "rect"},
-        }};
-        int index = 0;
-        for (auto &&i : colors) {
-            buttons.emplace_back(sf::Vector2f(100 * index, 20), i.second, font);
-            buttons.back().onClick = [color = i.first, &tool]() {
-                tool->setColor(color);
-            };
-            index++;
-        }
-        index = 0;
-        for (auto &&i : tools) {
-            buttons.emplace_back(sf::Vector2f(100 * index, 50), i.second, font);
-            buttons.back().onClick = [&tool, t = i.first]() {
-                tool = t;
-            };
-            index++;
-        }
-        tool = tools.at(0).first;
-    }
+    std::vector<Button> buttons = std::move(initButtons(font, tool));
 
     sf::RenderTexture permanentPicTexture;
     permanentPicTexture.create(window.getSize().x, window.getSize().y);
-    sf::Sprite permanentPic(permanentPicTexture.getTexture());
+    const sf::Sprite permanentPic(permanentPicTexture.getTexture());
     // permanentPicTexture.getTexture().copyToImage().saveToFile("file");
 
     bool isMousePressed = false;
 
     while (window.isOpen()) {
-        sf::Event event;
+        sf::Event event{};
         while (window.pollEvent(event)) {
             switch (event.type) {
                 case sf::Event::Closed: {
@@ -94,8 +108,8 @@ int main(int argc, const char *argv[]) {
 
                 case sf::Event::MouseButtonPressed: {
                     bool processed = false;
-                    for (auto &&i : buttons) {
-                        if (i.checkClick(window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y}))) {
+                    for (auto &&item : buttons) {
+                        if (item.checkClick(window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y}))) {
                             processed = true;
                             break;
                         }
@@ -122,14 +136,14 @@ int main(int argc, const char *argv[]) {
         }
         window.clear();
 
-        std::shared_ptr<BaseShape> d = tool->getDrawable();
+        const std::shared_ptr<BaseShape> data = tool->getDrawable();
         window.draw(permanentPic);
-        if (d) {
-            if (isMousePressed)
-                window.draw(*d);
-            else {
-                client->send(d);
-                permanentPicTexture.draw(*d);
+        if (data) {
+            if (isMousePressed) {
+                window.draw(*data);
+            } else {
+                client->send(data);
+                permanentPicTexture.draw(*data);
                 permanentPicTexture.display();
                 window.draw(permanentPic);
 
@@ -138,14 +152,14 @@ int main(int argc, const char *argv[]) {
         }
 
         auto recData = client->getData();
-        for (auto &&i : recData) {
-            permanentPicTexture.draw(*i);
+        for (auto &&item : recData) {
+            permanentPicTexture.draw(*item);
             permanentPicTexture.display();
         }
 
-        for (auto &&i : buttons) {
-            i.update();
-            window.draw(i);
+        for (auto &&item : buttons) {
+            item.update();
+            window.draw(item);
         }
 
         window.display();

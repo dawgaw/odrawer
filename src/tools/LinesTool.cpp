@@ -11,12 +11,12 @@ void LinesTool::onMousePressed(const sf::Vector2f& pos) {
     prevPos = pos;
 }
 std::shared_ptr<BaseShape> LinesTool::getDrawable() const {
-    if (lines.size())
+    if (!lines.empty()) {
         return std::make_shared<LinesPath>(lines);
-    else
-        return nullptr;
+    }
+    return nullptr;
 }
 void LinesTool::reset() {
     lines.clear();
 }
-LinesTool::LinesTool(const sf::Color& color) : BaseTool(color), lines({}), prevPos({}){};
+LinesTool::LinesTool(const sf::Color& color) : BaseTool(color){};

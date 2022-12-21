@@ -8,18 +8,19 @@ Button::Button(const sf::Vector2f &location, const sf::String &text, const sf::F
 }
 
 void Button::draw(sf::RenderTarget &target, sf::RenderStates states) const {
-    sf::RectangleShape b(this->size);
-    b.setPosition(this->location);
-    b.setFillColor(*this->curCol);
+    sf::RectangleShape rect(this->size);
+    rect.setPosition(this->location);
+    rect.setFillColor(*this->curCol);
 
-    target.draw(b);
+    target.draw(rect);
     target.draw(this->text);
 }
 
 void Button::update() {
+    using namespace std::chrono_literals;
     if (pressed) {
         const auto dur = std::chrono::high_resolution_clock::now() - this->pressedTime;
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(dur).count() > 200) {
+        if (dur > 200ms) {
             curCol = &this->defaultColor;
             pressed = false;
         }
@@ -29,16 +30,18 @@ void Button::handleClick() {
     pressedTime = std::chrono::system_clock::now();
     pressed = true;
     curCol = &this->pressedColor;
-    if (onClick)
+    if (onClick) {
         onClick();
+    }
 }
 
 bool Button::checkClick(const sf::Vector2f &mousePos) {
     const auto offsetX = mousePos.x - this->location.x;
     const auto offsetY = mousePos.y - this->location.y;
 
-    if (offsetX < 0 || offsetY < 0)
+    if (offsetX < 0 || offsetY < 0) {
         return false;
+    }
 
     if (offsetX < this->size.x && offsetY < this->size.y) {
         this->handleClick();
@@ -54,9 +57,9 @@ void Button::setText(const std::string &newText) {
     this->text.setFillColor(this->fontColor);
     this->text.setString(newText);
     const sf::FloatRect &tsize = this->text.getGlobalBounds();
-    const float ox = this->size.x - tsize.width;
-    const float oy = this->size.y - tsize.height - 5;
-    this->text.setPosition(this->location.x + ox / 2, this->location.y + oy / 2);
+    const float offsetX = this->size.x - tsize.width;
+    const float offsetY = this->size.y - tsize.height - 5;
+    this->text.setPosition(this->location.x + offsetX / 2, this->location.y + offsetY / 2);
 }
 
 sf::String Button::getText() const {

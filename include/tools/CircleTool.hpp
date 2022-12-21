@@ -1,5 +1,5 @@
-#ifndef CIRCLETOOL_HPP
-#define CIRCLETOOL_HPP
+#ifndef TOOLS_CIRCLETOOL_HPP
+#define TOOLS_CIRCLETOOL_HPP
 
 #include <tools/BaseTool.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef BASE_SHAPE_HPP
-#define BASE_SHAPE_HPP
+#ifndef SHAPES_BASESHAPE_HPP
+#define SHAPES_BASESHAPE_HPP
 
 #include <bitsery/bitsery.h>
 

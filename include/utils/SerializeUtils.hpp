@@ -1,5 +1,6 @@
-#ifndef kljeskgdsfasdf
-#define kljeskgdsfasdf
+#ifndef UTILS_SERIALIZEUTILS_HPP
+#define UTILS_SERIALIZEUTILS_HPP
+
 #include <bitsery/adapter/buffer.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/inheritance.h>

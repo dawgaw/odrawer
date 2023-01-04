@@ -15,8 +15,8 @@ constexpr int DEFAULT_HEIGHT = 400;
 constexpr int DEFAULT_WIDTH = 800;
 constexpr float BUTTON_OFFSET_Y = 20;
 constexpr float BUTTON_OFFSET_X = 10;
-constexpr float BUTTON_SIZE_Y = 25;
-constexpr float BUTTON_SIZE_X = 70;
+constexpr float BUTTON_SIZE_Y = 40;
+constexpr float BUTTON_SIZE_X = 80;
 constexpr int FRAME_RATE = 60;
 
 std::vector<Button> initButtons(const sf::Font &font, std::shared_ptr<BaseTool> &tool) {
@@ -29,9 +29,9 @@ std::vector<Button> initButtons(const sf::Font &font, std::shared_ptr<BaseTool> 
         {sf::Color::White, "White"},
     }};
     const std::array<std::pair<std::shared_ptr<BaseTool>, const sf::String>, 3> tools{{
-        {std::make_shared<LinesTool>(sf::Color::White), "pen"},
+        {std::make_shared<LinesTool>(sf::Color::White), "Pen"},
         {std::make_shared<CircleTool>(sf::Color::White), "Circle"},
-        {std::make_shared<RectangleTool>(sf::Color::White), "rect"},
+        {std::make_shared<RectangleTool>(sf::Color::White), "Rect"},
     }};
 
     std::vector<Button> buttons;
@@ -40,7 +40,7 @@ std::vector<Button> initButtons(const sf::Font &font, std::shared_ptr<BaseTool> 
     int index = 0;
     for (auto &&item : colors) {
         buttons.emplace_back(sf::Vector2f((BUTTON_SIZE_X + BUTTON_OFFSET_X) * index, BUTTON_OFFSET_Y), item.second, font, sf::Vector2f(BUTTON_SIZE_X, BUTTON_SIZE_Y));
-        buttons.back().onClick = [color = item.first, &tool]() {
+        buttons.back().onClick = [&tool, color = item.first]() {
             tool->setColor(color);
         };
         index++;
@@ -64,11 +64,11 @@ int main(int argc, const char *argv[]) {
     argParser.parse(argc, argv);
 
     const std::string serverAddress = argParser({"-a", "--address"}, "127.0.0.1").str();
-    std::cout << "ip:" << serverAddress;
+    std::cout << "ip:" << serverAddress << "\n";
 
     int port = DEFAULT_PORT;
     argParser({"-p", "--port"}, port) >> port;
-    std::cout << "port:" << port;
+    std::cout << "port:" << port << "\n";
 
     std::unique_ptr<Client> client = nullptr;
     std::unique_ptr<Server> server = nullptr;

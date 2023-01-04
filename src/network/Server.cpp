@@ -6,6 +6,10 @@
 
 Server::~Server() {
     this->listenThread->terminate();
+    std::for_each(this->clients.begin(), this->clients.end(), [](std::unique_ptr<sf::TcpSocket>& client) {
+        client->disconnect();
+    });
+    this->listener.close();
 }
 
 void Server::start(const std::string& ipAddress, int port) {

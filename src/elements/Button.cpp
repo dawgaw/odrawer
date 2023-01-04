@@ -56,10 +56,10 @@ void Button::setText(const std::string &newText) {
     this->text.setCharacterSize(16);
     this->text.setFillColor(this->fontColor);
     this->text.setString(newText);
+
     const sf::FloatRect &tsize = this->text.getGlobalBounds();
-    const float offsetX = this->size.x - tsize.width;
-    const float offsetY = this->size.y - tsize.height - 5;
-    this->text.setPosition(this->location.x + offsetX / 2, this->location.y + offsetY / 2);
+    this->text.setOrigin(tsize.width / 2.F, tsize.height / 2 + 3);
+    this->text.setPosition(this->location.x + this->size.x / 2, this->location.y + this->size.y / 2);
 }
 
 sf::String Button::getText() const {
